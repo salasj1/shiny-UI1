@@ -4,7 +4,7 @@ library(plotly)
 library(DT)
 library(leaflet)
 library(shinyWidgets)
-library(paqueteprueba)
+library(PaquetePrueba)
 library(htmltools)
 
 ui <- dashboardPage(
@@ -16,6 +16,7 @@ ui <- dashboardPage(
     )
   ),
   dashboardBody(
+    class = "dashboard1",
     tags$head(mypackageDependencies()),
     tabItems(
       tabItem(tabName = "tab1",
