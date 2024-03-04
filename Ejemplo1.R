@@ -1,42 +1,47 @@
+# En Ejemplo1.R
 library(shiny)
-library(shinydashboard)
 library(plotly)
 library(DT)
 library(leaflet)
 library(shinyWidgets)
 library(PaquetePrueba)
 library(htmltools)
+library(shinyjs)
 
-ui <- dashboardPage(
-  dashboardHeader(title = "Dashboard 1"),
-  dashboardSidebar(
-    sidebarMenu(
-      menuItem("Tab 1", tabName = "tab1"),
-      menuItem("Tab 2", tabName = "tab2")
-    )
-  ),
-  dashboardBody(
-    class = "dashboard1",
-    tags$head(mypackageDependencies()),
-    tabItems(
-      tabItem(tabName = "tab1",
+ui <- fluidPage(
+  useShinyjs(),
+  mypackageDependencies(),
+  sidebar(),
+  mainPanel(
+    tags$div(id = "empresa-header", tags$img(id="miImagen",src="https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png")),
+    div(class="main-panel",
+        hidden(textInput(inputId ="panel_state", label="",value="mis_tableros")),
+        conditionalPanel(
+          condition = "input.panel_state == 'mis_tableros'",
+          div(class="Tablero 1",
               fluidRow(
-                box(plotlyOutput("plot")),
-                box(DTOutput("table"))
+                plotlyOutput("plot"),
+                DTOutput("table")
               )
-      ),
-      tabItem(tabName = "tab2",
+          )
+        ),
+        conditionalPanel(
+          condition = "input.panel_state == 'tableros_vikua'",
+          div(class="Tablero 2",
               fluidRow(
-                box(leafletOutput("map")),
-                box(pickerInput(inputId = "picker", label = "Elija una opción", choices = c("Opción 1", "Opción 2", "Opción 3"))),
-                box(tags$button(id = "myButton", "Haz clic en mí", class = "btn action-button"))
+                leafletOutput("map"),
+                pickerInput(inputId = "picker", label = "Elija una opción", choices = c("Opción 1", "Opción 2", "Opción 3")),
+                tags$button(id = "myButton", "Haz clic en mí", class = "btn action-button")
               )
-      )
+          )
+        )
     )
+
   )
 )
 
-server <- function(input, output) {
+server <- function(input, output, session) {
+
   output$plot <- renderPlotly({
     plot_ly(data = iris, x = ~Sepal.Length, y = ~Petal.Length)
   })
@@ -48,6 +53,11 @@ server <- function(input, output) {
   output$map <- renderLeaflet({
     leaflet() %>% addTiles() %>% setView(-93.65, 42.0285, zoom = 17)
   })
+  observe_sidebar(input, output, session)
 }
 
-shinyApp(ui, server)
+# Define la aplicación Shiny
+app <- shinyApp(ui, server)
+
+# Ejecuta la aplicación en un host y puerto específicos
+runApp(app, host = "127.0.0.1", port = 8090)
