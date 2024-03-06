@@ -10,12 +10,13 @@ library(shinyjs)
 
 ui <- fluidPage(
   useShinyjs(),
-  mypackageDependencies(),
-  sidebar(),
+  mypackageDependencies(),#Importante para el boton
+  sidebarPanel(sidebar()),
   mainPanel(
+    hidden(textInput(inputId ="panel_state", label="",value="mis_tableros")),
     tags$div(id = "empresa-header", tags$img(id="miImagen",src="https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png")),
     div(class="main-panel",
-        hidden(textInput(inputId ="panel_state", label="",value="mis_tableros")),
+        actionBttn(inputId = "my_button1", label = cuadros("Mis Tableros"), class = "boton-vikua"),#Importante para el boton
         conditionalPanel(
           condition = "input.panel_state == 'mis_tableros'",
           div(class="Tablero 1",
@@ -42,6 +43,10 @@ ui <- fluidPage(
 
 server <- function(input, output, session) {
 
+  # Importante para el boton
+  observe({
+    shinyjs::runjs("resetClass('my_button1')")
+  })
   output$plot <- renderPlotly({
     plot_ly(data = iris, x = ~Sepal.Length, y = ~Petal.Length)
   })
@@ -53,11 +58,11 @@ server <- function(input, output, session) {
   output$map <- renderLeaflet({
     leaflet() %>% addTiles() %>% setView(-93.65, 42.0285, zoom = 17)
   })
-  observe_sidebar(input, output, session)
+
 }
 
 # Define la aplicación Shiny
 app <- shinyApp(ui, server)
 
 # Ejecuta la aplicación en un host y puerto específicos
-runApp(app, host = "127.0.0.1", port = 8090)
+runApp(app, host = "127.0.0.1", port = 8092)
