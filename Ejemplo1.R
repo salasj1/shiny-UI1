@@ -1,9 +1,11 @@
 # En Ejemplo1.R
+
 library(shiny)
 library(plotly)
 library(DT)
 library(leaflet)
 library(shinyWidgets)
+library(devtools)
 library(PaquetePrueba)
 library(htmltools)
 library(shinyjs)
@@ -11,17 +13,20 @@ library(shinyjs)
 ui <- fluidPage(
   useShinyjs(),
   mypackageDependencies(),#Importante para el boton
-  sidebarPanel(sidebar()),
+  sidebar(),
   mainPanel(
-    hidden(textInput(inputId ="panel_state", label="",value="mis_tableros")),
-    tags$div(id = "empresa-header", tags$img(id="miImagen",src="https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png")),
+
     div(class="main-panel",
-        actionBttn(inputId = "my_button1", label = cuadros("Mis Tableros"), class = "boton-vikua"),#Importante para el boton
+        tags$div(id = "empresa-header", tags$img(id="miImagen",src="https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png")),
+        hidden(textInput(inputId ="panel_state", label="",value="mis_tableros")),
+        actionBttn(inputId = "my_button1", label = cuadros("Mis Tableros"), class = "action-button boton-vikua"), # Asegúrate de que el botón tiene la clase 'action-button' y 'boton-vikua'
+
         conditionalPanel(
           condition = "input.panel_state == 'mis_tableros'",
           div(class="Tablero 1",
               fluidRow(
                 plotlyOutput("plot"),
+                actionBttn(inputId = "my_button3", label = cuadros("ratas"), class = "action-button boton-vikua"), # Asegúrate de que el botón tiene la clase 'action-button' y 'boton-vikua'
                 DTOutput("table")
               )
           )
@@ -43,10 +48,9 @@ ui <- fluidPage(
 
 server <- function(input, output, session) {
 
-  # Importante para el boton
-  observe({
-    shinyjs::runjs("resetClass('my_button1')")
-  })
+  # observe({
+  #   shinyjs::runjs("resetButtons()")
+  # })
   output$plot <- renderPlotly({
     plot_ly(data = iris, x = ~Sepal.Length, y = ~Petal.Length)
   })
@@ -65,4 +69,4 @@ server <- function(input, output, session) {
 app <- shinyApp(ui, server)
 
 # Ejecuta la aplicación en un host y puerto específicos
-runApp(app, host = "127.0.0.1", port = 8092)
+runApp(app, host = "127.0.0.1", port = 8098)
