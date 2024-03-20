@@ -1,10 +1,16 @@
 # En Ejemplo1.R
 
-#remove.packages("PaquetePrueba")
+#remove.packages("DisenoVikua")
+#remove.packages("DisenoVikua")
 #install_github("salasj1/PaquetePrueba")
-install.packages("C:/Users/aleja/Downloads/shiny-UI1/PaquetePrueba", repos = NULL, type = "source")
+if (!require(devtools)) {
+  install.packages("devtools")
+}
+install_github("salasj1/DisenoVikua")
+#install.packages("C:/Users/aleja/Downloads/shiny-UI1/DisenoVikua", repos = NULL, type = "source")
 library(shiny)
 library(plotly)
+library(DisenoVikua)
 library(DT)
 library(bsicons)
 library(bslib)
@@ -12,10 +18,7 @@ library(shiny.semantic)
 library(leaflet)
 library(shinyWidgets)
 library(devtools)
-if (!require(devtools)) {
-  install.packages("devtools")
-}
-library(PaquetePrueba)
+
 library(htmltools)
 library(shinyjs)
 library(bs4Dash)
@@ -60,12 +63,14 @@ ui <- fluidPage(
                 textInput(inputId = "my_text_input", label = div("Ingresa el nombre del Tablero",class="input-label"), value = ""),
                 tags$br(),
                 actionBttn(inputId = "my_button1", label = cuadros("Mis Tableros"), class = "boton-vikua"),
+                tags$br(),
+                textInput("search", label = "Search", value = ""),
                 tags$br()
             ),
             div( class="col",
 
                 bs4Card(id=1,
-                        title =  tags$img(src = 'https://github.com/salasj1/PaquetePrueba/blob/ce93c6aee2957f663730acc172f65b9ce75cb0bd/inst/assets/img/group-1.png?raw=true', alt = ""),
+                        title =  tags$img(src = 'https://github.com/salasj1/DisenoVikua/blob/ce93c6aee2957f663730acc172f65b9ce75cb0bd/inst/assets/img/group-1.png?raw=true', alt = ""),
                         status = "primary",
                         solidHeader = FALSE,
                         collapsible = FALSE,
@@ -81,7 +86,7 @@ ui <- fluidPage(
                   value = div("82", class = "value-box-text-2"),
                   p("25% vs mes anterior", class="value-box-text-3"),
                   theme = value_box_theme(bg = "#FFFFFF", fg = "#000000"),
-                  showcase = tags$img(src="https://github.com/salasj1/PaquetePrueba/blob/e39f2bd1734c672a3df4f39bfabd53370db4f288/inst/assets/img/alarm.png?raw=true",class="value-box-icon"),
+                  showcase = tags$img(src="https://github.com/salasj1/DisenoVikua/blob/e39f2bd1734c672a3df4f39bfabd53370db4f288/inst/assets/img/alarm.png?raw=true",class="value-box-icon"),
                   showcase_layout = "left center",
                   full_screen = TRUE, fill = FALSE, height = NULL,width = 4,
 
