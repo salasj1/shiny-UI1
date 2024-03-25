@@ -1,16 +1,9 @@
-# En Ejemplo1.R
-
 #remove.packages("DisenoVikua")
-#remove.packages("DisenoVikua")
-#install_github("salasj1/PaquetePrueba")
-if (!require(devtools)) {
-  install.packages("devtools")
-}
-install_github("salasj1/DisenoVikua")
-#install.packages("C:/Users/aleja/Downloads/shiny-UI1/DisenoVikua", repos = NULL, type = "source")
+#devtools::install_github("salasj1/DisenoVikua")
+install.packages("C:/Users/aleja/Downloads/shiny-UI1/DisenoVikua", repos = NULL, type = "source")
+library(DisenoVikua)
 library(shiny)
 library(plotly)
-library(DisenoVikua)
 library(DT)
 library(bsicons)
 library(bslib)
@@ -18,18 +11,16 @@ library(shiny.semantic)
 library(leaflet)
 library(shinyWidgets)
 library(devtools)
-
 library(htmltools)
 library(shinyjs)
 library(bs4Dash)
 ui <- fluidPage(
   useShinyjs(),
   mypackageDependencies(),
-  sidebar(),
+  DisenoVikua::sidebar(),
+  DisenoVikua::titlePanel("https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png","https://raw.githubusercontent.com/salasj1/DisenoVikua/49e83541c07648d68f3ea88b12abf9bed7fb4e12/inst/assets/img/perfil-ejemplo.svg"),
   mainPanel(
-
     div(class="main-panel",
-        tags$div(id = "empresa-header", tags$img(id="miImagen",src="https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png"),div(class="empresa-header")),
         div(class="row",
             div(class="col",style="gap: 20px;",
                 verbatimTextOutput("value"),
@@ -37,8 +28,8 @@ ui <- fluidPage(
                 selectizeInput(
                   inputId = "selectize1",
                   label = div("Empresa",class="selectize-label"),
-                  choices = c("Opción 1", "Opción 2", "Opción 3"),
                   selected = NULL,
+                  choices = c("","Opción 1", "Opción 2", "Opción 3"),
                   options = list(
                     placeholder = 'Seleccione una opción',
                     hideSelected = FALSE,
@@ -60,23 +51,28 @@ ui <- fluidPage(
                   )
                 ),
                 tags$br(),
-                textInput(inputId = "my_text_input", label = div("Ingresa el nombre del Tablero",class="input-label"), value = ""),
+                textInput(inputId = "my_text_input", label = div(id="__nombre","Nombre",class="input-label"), value = ""),
                 tags$br(),
                 actionBttn(inputId = "my_button1", label = cuadros("Mis Tableros"), class = "boton-vikua"),
                 tags$br(),
                 textInput("search", label = "Search", value = ""),
-                tags$br()
+                tags$br(),
+                textInput(inputId = "my_text_input3", label = div("Ingresa el nombre del Tablero",class="input-label"), value = ""),
+                actionButton(inputId = "show", label = "Show Notification")
             ),
             div( class="col",
 
-                bs4Card(id=1,
+                bs4Card(id="card1",
                         title =  tags$img(src = 'https://github.com/salasj1/DisenoVikua/blob/ce93c6aee2957f663730acc172f65b9ce75cb0bd/inst/assets/img/group-1.png?raw=true', alt = ""),
                         status = "primary",
                         solidHeader = FALSE,
                         collapsible = FALSE,
                         closable = FALSE,
                         body ="",
-                        bodycard1("Card 1", "This is a card","Si funciona")
+                        DisenoVikua::bodycard1("Card 1",
+                                               "This is a card",
+                                               "Presiona",
+                                               HTML("<i class=\"fa-solid fa-pencil\" style=\"font-size: 15px;\"></i>"))
                 )
             ),
             div(class="col",
@@ -120,6 +116,7 @@ ui <- fluidPage(
                       showcase_layout = "left center",
                       full_screen = TRUE, fill = FALSE, height = NULL,width = 4,
                     )
+
                 ),
                 div(class="col-sm-3",
                     value_box(
@@ -152,8 +149,17 @@ ui <- fluidPage(
                       showcase_layout = "left center",
                       full_screen = TRUE, fill = FALSE, height = NULL,width = 4,
                     )
-                )
+                ),
+
+
             )
+        ),
+        div(class="row",style="gap: 20px;",
+            div(class="col-sm-6",
+                passwordInput(inputId = "password1",label=div("Contraseña",class="input-label"))),
+            div(class="col-sm-6",
+                passwordInput(inputId = "password2", label=div("Confirmar Contraseña",class="input-label"))),
+            tags$br(),
         ),
         div(class="row",
             conditionalPanel(
@@ -193,21 +199,35 @@ ui <- fluidPage(
 server <- function(input, output, session) {
 
   observeEvent(input$my_text_input, {
-    validate(
-      need(input$my_text_input != "", "Error: El campo de texto está vacío.")
-    )
-  })
-  observeEvent(input$my_button1, {
-    validate(
-      need(input$my_text_input != "", "Este campo es obligatorio")
-    )
+    # Si el campo de texto 'my_text_input' está vacío
+    if (input$my_text_input == "") {
+      # Agrega un mensaje de error al campo de texto llamando a la funcion addErrorMessage
+      session$sendCustomMessage(type = 'addErrorMessage', message = list(ids = c('my_text_input'), messageText = 'Este campo es obligatorio'))
+    } else {
+      # Si el campo de texto no está vacío, elimina el mensaje de error
+      session$sendCustomMessage(type = 'removeErrorMessage', message = list(ids = c('my_text_input')))
+    }
   })
 
+
+
+
+  observeEvent(list(input$password1, input$password2), {
+    # Si los campos de texto 'password1' y 'password2' no son iguales
+    if (input$password1 != input$password2) {
+      # Agrega un mensaje de error a ambos campos de texto llamando a la funcion addErrorMessage
+      session$sendCustomMessage(type = 'addErrorMessage', message = list(ids = c('password1', 'password2'), messageText = 'Las contraseñas no coinciden'))
+    } else {
+      # Si las contraseñas coinciden, elimina el mensaje de error
+      session$sendCustomMessage(type = 'removeErrorMessage', message = list(ids = c('password1', 'password2')))
+    }
+  })
   observeEvent(input$show, {
-    showNotification(
+    shiny::showNotification(
       "Error: Por favor, introduce un texto.",
       type = "error"  # Esto hará que el mensaje se muestre en rojo
     )
+    print("El evento show ha sido activado")  # Agrega esta línea
   })
 
   output$map <- renderLeaflet({
@@ -237,4 +257,4 @@ server <- function(input, output, session) {
 app <- shinyApp(ui, server)
 
 # Ejecuta la aplicación en un host y puerto específicos
-runApp(app, host = "127.0.0.1", port = 8185)
+runApp(app, host = "127.0.0.1", port = 8190)
